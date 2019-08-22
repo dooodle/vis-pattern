@@ -21,10 +21,13 @@ func main() {
 //}
 //LIMIT 25`
 
-	b := `SELECT ?subject ?predicate ?object
-WHERE {
-  ?subject <http://dooodle/predicate/hasColumn> ?object .
-}
+	b := `SELECT * WHERE {
+  ?sub <http://dooodle/predicate/hasColumn> ?obj .
+  ?sub <http://dooodle/predicate/hasColumn> ?key .
+  ?key <http://dooodle/predicate/numDistinct> ?num .
+  ?obj <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
+  FILTER (?num > 0 && ?num <= 100)
+} 
 LIMIT 200`
 
 	body := bytes.NewReader([]byte(b))
