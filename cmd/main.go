@@ -19,7 +19,7 @@ const (
 
 var currentFormat = Csv
 var sparqlUrl = "http://178.62.59.88:31392/mondial"
-var keyLimit = "100"
+var keyLimit = "200"
 
 func main() {
 	writeBarchartMapping(os.Stdout)
@@ -30,7 +30,7 @@ func main() {
 func writeBarchartMapping(w io.Writer) {
 	b := `SELECT ?entity ?key ?scalar WHERE {
   ?entity <http://dooodle/predicate/hasColumn> ?scalar .
-  ?entity <http://dooodle/predicate/hasColumn> ?key .
+  ?entity <http://dooodle/predicate/hasKey> ?key .
   ?key <http://dooodle/predicate/numDistinct> ?num .
   ?scalar <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
   FILTER (?num > 0 && ?num <= `+ keyLimit +`)
@@ -55,7 +55,8 @@ LIMIT 200`
 }
 
 func writeScatterMapping(w io.Writer) {
-	b := `SELECT ?entity ?scalarA ?scalarB WHERE {
+	b := `SELECT ?entity ?key ?scalarA ?scalarB WHERE {
+  ?entity <http://dooodle/predicate/hasKey> ?key .
   ?entity <http://dooodle/predicate/hasColumn> ?scalarA .
   ?entity <http://dooodle/predicate/hasColumn> ?scalarB .
   ?scalarA <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
@@ -81,7 +82,8 @@ LIMIT 200`
 }
 
 func writeBubbleMapping(w io.Writer) {
-	b := `SELECT ?entity ?scalarA ?scalarB ?scalarC WHERE {
+	b := `SELECT ?entity ?key ?scalarA ?scalarB ?scalarC WHERE {
+  ?entity <http://dooodle/predicate/hasKey> ?key .
   ?entity <http://dooodle/predicate/hasColumn> ?scalarA .
   ?entity <http://dooodle/predicate/hasColumn> ?scalarB .
   ?entity <http://dooodle/predicate/hasColumn> ?scalarC .
