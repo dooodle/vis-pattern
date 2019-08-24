@@ -35,17 +35,17 @@ func main() {
 	}
 	// serve
 	// could add in a caching layer here...
-	http.HandleFunc("mondial/basic/bar", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/mondial/basic/bar", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("serving mondial basic bar chart mappings")
 		writeBarchartMapping(w)
 	})
 
-	http.HandleFunc("mondial/basic/scatter", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/mondial/basic/scatter", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("serving mondial basic scatter mappings")
 		writeScatterMapping(w)
 	})
 
-	http.HandleFunc("mondial/basic/bubble", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/mondial/basic/bubble", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("serving mondial basic bubble mappings")
 		writeBubbleMapping(w)
 	})
