@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matcher-deployment
+  labels:
+    app: matcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matcher
+  template:
+    metadata:
+      labels:
+        app: matcher
+    spec:
+      containers:
+      - name: matcher
+        image: dooodle/vis-matcher:latest
+        ports:
+        - containerPort: 8080
+        env:
+          - name: VIS_MONDIAL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: vis-simple-config-map
+                key: VIS_MONDIAL_USER
+          - name: VIS_MONDIAL_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: vis-simple-config-map
+                key: VIS_MONDIAL_PASSWORD
+          - name: VIS_MONDIAL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: vis-simple-config-map
+                key: VIS_MONDIAL_HOST
+          - name: VIS_MONDIAL_PORT
+            valueFrom:            
+               configMapKeyRef:
+                name: vis-simple-config-map
+                key: VIS_MONDIAL_PORT
+          - name: VIS_MONDIAL_SSLMODE
+            valueFrom:            
+              configMapKeyRef:
+                name: vis-simple-config-map
+                key: VIS_MONDIAL_SSLMODE
+          - name: VIS_MONDIAL_DBNAME
+            valueFrom:            
+              configMapKeyRef:
+                name: vis-simple-config-map
+                key: VIS_MONDIAL_DBNAME

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"io"
 	"log"
 	"net/http"
@@ -17,14 +18,42 @@ const (
 	Xml
 )
 
+var serve = flag.Bool("serve", false, "serve")
+var port = flag.String("http", ":8080", "port")
+
 var currentFormat = Csv
 var sparqlUrl = "http://178.62.59.88:31392/mondial"
-var keyLimit = "200"
+var keyLimit = "100"
 
 func main() {
-	writeBarchartMapping(os.Stdout)
-	writeScatterMapping(os.Stdout)
-	writeBubbleMapping(os.Stdout)
+	flag.Parse()
+	if !*serve {
+		writeBarchartMapping(os.Stdout)
+		writeScatterMapping(os.Stdout)
+		writeBubbleMapping(os.Stdout)
+		os.Exit(0)
+	}
+	// serve
+	// could add in a caching layer here...
+	http.HandleFunc("mondial/basic/bar", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("serving mondial basic bar chart mappings")
+		writeBarchartMapping(w)
+	})
+
+	http.HandleFunc("mondial/basic/scatter", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("serving mondial basic scatter mappings")
+		writeScatterMapping(w)
+	})
+
+	http.HandleFunc("mondial/basic/bubble", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("serving mondial basic bubble mappings")
+		writeBubbleMapping(w)
+	})
+	log.Println("starting server at", *port)
+	if err := http.ListenAndServe(*port, nil); err != nil {
+		log.Fatal(err)
+	}
+
 }
 
 func writeBarchartMapping(w io.Writer) {
@@ -33,7 +62,7 @@ func writeBarchartMapping(w io.Writer) {
   ?entity <http://dooodle/predicate/hasKey> ?key .
   ?key <http://dooodle/predicate/numDistinct> ?num .
   ?scalar <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
-  FILTER (?num > 0 && ?num <= `+ keyLimit +`)
+  FILTER (?num > 0 && ?num <= ` + keyLimit + `)
   FILTER (?key != ?scalar)
 } 
 LIMIT 200`
