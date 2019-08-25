@@ -31,6 +31,7 @@ func main() {
 		writeBarchartMapping(os.Stdout)
 		writeScatterMapping(os.Stdout)
 		writeBubbleMapping(os.Stdout)
+		writeWeakLineMapping(os.Stdout)
 		os.Exit(0)
 	}
 	// serve
@@ -49,6 +50,12 @@ func main() {
 		log.Println("serving mondial basic bubble mappings")
 		writeBubbleMapping(w)
 	})
+
+	http.HandleFunc("/mondial/weak/line", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("serving mondial weak line mappings")
+		writeWeakLineMapping(w)
+	})
+
 	log.Println("starting server at", *port)
 	if err := http.ListenAndServe(*port, nil); err != nil {
 		log.Fatal(err)
@@ -122,6 +129,32 @@ func writeBubbleMapping(w io.Writer) {
   FILTER (?scalarA != ?scalarB)
   FILTER (?scalarA != ?scalarC)
   FILTER (?scalarB != ?scalarC)
+} 
+LIMIT 200`
+	body := bytes.NewReader([]byte(b))
+	req, err := http.NewRequest("POST", sparqlUrl, body)
+	req.Header.Set("Content-type", "application/sparql-query")
+	req.Header.Set("Accept", mimeFormat(currentFormat))
+	if err != nil {
+		log.Fatal(err)
+	}
+	//req.SetBasicAuth("","")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	io.Copy(w, resp.Body)
+}
+
+func writeWeakLineMapping(w io.Writer) {
+	b := `SELECT ?entity ?strong ?weak ?measure WHERE {
+  ?entity <http://dooodle/predicate/hasCompoundKey> ?key .
+  ?key <http://dooodle/predicate/hasStrongKey> ?strong .
+  ?key <http://dooodle/predicate/hasWeakKey> ?weak .
+  ?entity <http://dooodle/predicate/hasColumn> ?measure .
+  ?measure <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
 } 
 LIMIT 200`
 	body := bytes.NewReader([]byte(b))
