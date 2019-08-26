@@ -32,6 +32,7 @@ func main() {
 		writeScatterMapping(os.Stdout)
 		writeBubbleMapping(os.Stdout)
 		writeWeakLineMapping(os.Stdout)
+		writeO2mCircleMapping(os.Stdout)
 		os.Exit(0)
 	}
 	// serve
@@ -56,11 +57,45 @@ func main() {
 		writeWeakLineMapping(w)
 	})
 
+	http.HandleFunc("/mondial/o2m/circle", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("serving mondial o2m circle packing mappings")
+		writeO2mCircleMapping(w)
+	})
+
 	log.Println("starting server at", *port)
 	if err := http.ListenAndServe(*port, nil); err != nil {
 		log.Fatal(err)
 	}
 
+}
+
+
+
+func writeO2mCircleMapping(w io.Writer) {
+	b := `SELECT ?entity ?one ?many WHERE {
+	?entity  <http://dooodle/predicate/hasOne2ManyKey> ?key .
+	?key  <http://dooodle/predicate/hasOneKey> ?one .
+	?key <http://dooodle/predicate/hasManyKey> ?many .
+	?one <http://dooodle/predicate/numDistinct> ?numOne .
+	?many <http://dooodle/predicate/numDistinct> ?numMany .	
+	}
+	LIMIT 200`
+
+	body := bytes.NewReader([]byte(b))
+	req, err := http.NewRequest("POST", sparqlUrl, body)
+	req.Header.Set("Content-type", "application/sparql-query")
+	req.Header.Set("Accept", mimeFormat(currentFormat))
+	if err != nil {
+		log.Fatal(err)
+	}
+	//req.SetBasicAuth("","")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	io.Copy(w, resp.Body)
 }
 
 func writeBarchartMapping(w io.Writer) {
