@@ -92,7 +92,7 @@ func writeM2mChordMapping(w io.Writer) {
 	FILTER (?n1 < `+ ChordLimit + `)
 	FILTER (?n2 < `+ ChordLimit + `)
 	}
-	LIMIT 200`
+	LIMIT 1000`
 
 	body := bytes.NewReader([]byte(b))
 	req, err := http.NewRequest("POST", sparqlUrl, body)
