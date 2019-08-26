@@ -62,6 +62,11 @@ func main() {
 		writeO2mCircleMapping(w)
 	})
 
+	http.HandleFunc("/mondial/m2m/chord", func(w http.ResponseWriter, r *http.Request) {
+		log.Println("serving mondial m2m chord packing mappings")
+		writeM2mChordMapping(w)
+	})
+
 	log.Println("starting server at", *port)
 	if err := http.ListenAndServe(*port, nil); err != nil {
 		log.Fatal(err)
@@ -70,6 +75,41 @@ func main() {
 }
 
 
+
+func writeM2mChordMapping(w io.Writer) {
+	b := `SELECT ?entity ?m1 ?m2 ?measure 
+    WHERE {
+	?entity <http://dooodle/predicate/hasMany2ManyKey> ?key ;
+		    <http://dooodle/predicate/hasColumn> ?measure .   
+	?key <http://dooodle/predicate/hasManyKey> ?m1 .
+	?key <http://dooodle/predicate/hasManyKey> ?m2 .
+	?m1 <http://dooodle/predicate/numDistinct> ?n1 .
+	?m2 <http://dooodle/predicate/numDistinct> ?n2 .
+	?measure <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
+	FILTER (?measure != ?m1)
+	FILTER (?measure != ?m2)
+	FILTER (?m1 != ?m2)
+	FILTER (?n1 < 100)
+	FILTER (?n2 < 100)
+	}
+	LIMIT 200`
+
+	body := bytes.NewReader([]byte(b))
+	req, err := http.NewRequest("POST", sparqlUrl, body)
+	req.Header.Set("Content-type", "application/sparql-query")
+	req.Header.Set("Accept", mimeFormat(currentFormat))
+	if err != nil {
+		log.Fatal(err)
+	}
+	//req.SetBasicAuth("","")
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer resp.Body.Close()
+	io.Copy(w, resp.Body)
+}
 
 func writeO2mCircleMapping(w io.Writer) {
 	b := `SELECT ?entity ?one ?many WHERE {
