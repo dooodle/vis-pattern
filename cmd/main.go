@@ -224,9 +224,18 @@ LIMIT 200`
 }
 
 func writeWeakLineMapping(w io.Writer) {
+//	b := `SELECT ?entity ?strong ?weak ?measure WHERE {
+//  ?entity <http://dooodle/predicate/hasCompoundKey> ?key .
+//  ?key <http://dooodle/predicate/meetsCondition> <http://dooodle/cond/similar> .
+//  ?key <http://dooodle/predicate/hasStrongKey> ?strong .
+//  ?key <http://dooodle/predicate/hasWeakKey> ?weak .
+//  ?entity <http://dooodle/predicate/hasColumn> ?measure .
+//  ?measure <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
+//}
+//LIMIT 200`
+
 	b := `SELECT ?entity ?strong ?weak ?measure WHERE {
   ?entity <http://dooodle/predicate/hasCompoundKey> ?key .
-  ?key <http://dooodle/predicate/meetsCondition> <http://dooodle/cond/similar> .
   ?key <http://dooodle/predicate/hasStrongKey> ?strong .
   ?key <http://dooodle/predicate/hasWeakKey> ?weak .
   ?entity <http://dooodle/predicate/hasColumn> ?measure .
