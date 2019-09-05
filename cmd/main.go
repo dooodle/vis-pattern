@@ -75,7 +75,7 @@ func main() {
 }
 
 
-var ChordLimit = "1000"
+var ChordLimit = "150"
 func writeM2mChordMapping(w io.Writer) {
 	b := `SELECT ?entity ?m1 ?m2 ?measure 
     WHERE {
