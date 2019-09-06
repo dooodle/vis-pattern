@@ -15,6 +15,7 @@ notifications:
   
 script:
   - go get -u
+  - go test -v ./...
   - CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o server ./cmd/main.go
   - docker build -t dooodle/vis-matcher .
   - bash install-kubectl
