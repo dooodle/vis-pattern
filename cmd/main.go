@@ -23,7 +23,7 @@ var port = flag.String("http", ":8080", "port")
 
 var currentFormat = Csv
 var sparqlUrl = "http://178.62.59.88:31392/mondial"
-var keyLimit = "100"
+var keyLimit = "300"
 
 func main() {
 	flag.Parse()
@@ -141,13 +141,13 @@ func writeO2mCircleMapping(w io.Writer) {
 func writeBarchartMapping(w io.Writer) {
 	b := `SELECT ?entity ?key ?scalar WHERE {
   ?entity <http://dooodle/predicate/hasColumn> ?scalar .
-  ?entity <http://dooodle/predicate/hasKey> ?key .
+  ?entity <http://dooodle/predicate/hasSingleKey> ?key .
   ?key <http://dooodle/predicate/numDistinct> ?num .
   ?scalar <http://dooodle/predicate/hasDimension> <http://dooodle/dimension/scalar> .
   FILTER (?num > 0 && ?num <= ` + keyLimit + `)
-  FILTER (?key != ?scalar)
 } 
 LIMIT 200`
+
 	body := bytes.NewReader([]byte(b))
 	req, err := http.NewRequest("POST", sparqlUrl, body)
 	req.Header.Set("Content-type", "application/sparql-query")
