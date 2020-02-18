@@ -22,7 +22,8 @@ var serve = flag.Bool("serve", false, "serve")
 var port = flag.String("http", ":8080", "port")
 
 var currentFormat = Csv
-var sparqlUrl = "http://64.227.42.67:31397/mondial"
+
+var sparqlUrl = "http://64.227.42.67:31159/mondial"
 var keyLimit = "300"
 
 func main() {
